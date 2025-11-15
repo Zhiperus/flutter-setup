@@ -30,13 +30,12 @@ error() {
 #############################################
 install_core_packages() {
   log "Installing core system dependencies..."
-  sudo apt update
-  sudo apt install -y \
+  sudo pacman -Syu --noconfirm \
     curl wget unzip zip git jq \
-    apt-transport-https ca-certificates gnupg \
-    build-essential \
-    libgtk-3-dev clang cmake ninja-build pkg-config \
-    openjdk-17-jdk
+    gnupg \
+    base-devel \
+    gtk3 clang cmake ninja \
+    jdk17-openjdk
 }
 
 #############################################
@@ -152,17 +151,7 @@ detect_flutter_version() {
 #############################################
 install_dart_fvm() {
   log "Installing Dart..."
-
-  sudo apt install -y apt-transport-https
-
-  wget -qO- https://dl-ssl.google.com/linux/linux_signing_key.pub |
-    gpg --dearmor | sudo tee /usr/share/keyrings/dart.gpg >/dev/null
-
-  echo "deb [signed-by=/usr/share/keyrings/dart.gpg] \
-https://storage.googleapis.com/download.dartlang.org/linux/debian stable main" |
-    sudo tee /etc/apt/sources.list.d/dart_stable.list
-
-  sudo apt update && sudo apt install -y dart
+  sudo pacman -S --noconfirm --needed dart
 
   log "Installing FVM..."
 
@@ -277,7 +266,6 @@ generate_debug_keystore() {
 bootstrap_flutter() {
   pushd "$PROJECT_DIR" >/dev/null
   fvm flutter pub get
-  fvm flutter build apk --debug || warn "Initial debug build failed"
   fvm flutter doctor
   popd >/dev/null
 }
